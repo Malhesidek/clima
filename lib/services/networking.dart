@@ -1,5 +1,4 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import "package:http/http.dart" as http;
 
 class NetworkHelper {
   final String url;
@@ -7,12 +6,11 @@ class NetworkHelper {
   NetworkHelper({required this.url});
 
   Future<String> getData() async {
-    // print(location.getLatitude());
     final response = await http.get(Uri.parse(url));
     try {
       return response.body;
-      // return jsonDecode(response.body);
     } on Exception catch (e) {
+      // ignore: unnecessary_brace_in_string_interps
       return "Status code: ${response.statusCode}, Error: ${e}";
     }
   }

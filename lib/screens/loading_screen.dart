@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:clima/screens/city_screen.dart';
 import 'package:clima/screens/location_screen.dart';
 import 'package:clima/services/location.dart';
@@ -20,16 +22,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void getLocation() async {
     Location location = Location();
+    // returns an object with latitude and longitude 
     await location.getLocation();
     NetworkHelper networkHelper = NetworkHelper(
         url:
-            'https://api.open-meteo.com/v1/forecast?latitude=${location.getLatitude()}&longitude=${location.getLongitude()}&current=temperature_2m&hourly=temperature_2m&forecast_days=1');
+            'https://api.openweathermap.org/data/2.5/weather?lat=${location.getLatitude()}&lon=${location.getLongitude()}&appid=fdf9fe80c98a1cca9f17db52257cd502&units=metric');
     var weatherData = await networkHelper.getData();
-    print(weatherData);
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LocationScreen()));
-    // print(
-    //     "Latitude: ${location.getLatitude()}, longitude: ${location.getLongitude()}");
+    // print(weatherData);
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => LocationScreen(
+              locationWeather: jsonDecode(weatherData),
+            )));
   }
 
   @override
