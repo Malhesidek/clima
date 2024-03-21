@@ -1,3 +1,4 @@
+import 'package:clima/screens/city_screen.dart';
 import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
@@ -24,13 +25,20 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void updateUI(dynamic weatherData) {
-    try {
-      temperature = weatherData["main"]["temp"];
-      condition = weatherData['weather'][0]['id'];
-      cityName = weatherData['name'];
-    } on Exception catch (e) {
-      print(e);
-    }
+    setState(() {
+      if (weatherData == null) {
+        temperature = 0;
+        cityName = '';
+        return;
+      }
+      try {
+        temperature = weatherData["main"]["temp"];
+        condition = weatherData['weather'][0]['id'];
+        cityName = weatherData['name'];
+      } on Exception catch (e) {
+        print(e);
+      }
+    });
   }
 
   @override
@@ -55,14 +63,18 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      updateUI(widget.locationWeather);
+                    },
                     child: const Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => CityScreen()));
+                    },
                     child: const Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -79,7 +91,9 @@ class _LocationScreenState extends State<LocationScreen> {
                       style: kTempTextStyle,
                     ),
                     Text(
-                      WeatherModel.getWeatherIcon(condition!),
+                      condition != null
+                          ? WeatherModel.getWeatherIcon(condition!)
+                          : 'Error',
                       style: kConditionTextStyle,
                     ),
                   ],
@@ -88,7 +102,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "${WeatherModel.getMessage(condition!)} in ${cityName}",
+                  "${condition != null ? WeatherModel.getWeatherIcon(condition!) : 'Unable to get weather data'} in ${cityName}",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
