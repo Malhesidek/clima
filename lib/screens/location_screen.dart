@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:clima/screens/city_screen.dart';
 import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
@@ -72,8 +74,16 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => CityScreen()));
+                    onPressed: () async {
+                      var typedName = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => CityScreen()));
+                      if (typedName != null) {
+                        var weatherData =
+                            await WeatherModel.getCityWeather(typedName);
+                        var locationWeather = jsonDecode(weatherData);
+                        updateUI(locationWeather);
+                      }
                     },
                     child: const Icon(
                       Icons.location_city,
@@ -102,7 +112,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "${condition != null ? WeatherModel.getWeatherIcon(condition!) : 'Unable to get weather data'} in ${cityName}",
+                  "${condition != null ? WeatherModel.getMessage(condition!) : 'Unable to get weather data'} in ${cityName}",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
